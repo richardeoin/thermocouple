@@ -1,0 +1,34 @@
+[package]
+name = "thermocouple"
+description = "thermocouple routines"
+version = "0.1.0"
+authors = ["Richard Meadows <richard@richard.fish>"]
+edition = "2018"
+readme = "README.md"
+keywords = ["thermocouple", "temperature", "measurement"]
+categories = ["science"]
+license = "Apache-2.0/MIT"
+documentation = "https://docs.rs/thermocouple"
+repository = "https://github.com/richardeoin/thermocouple"
+
+[package.metadata.docs.rs]
+all-features = true
+
+[dependencies]
+libm = { version = "0.1.4", optional = true }
+
+[features]
+k-type = ["libm"]
+use_serde = []
+f32 = []
+f64 = []
+default = ["f64", "k-type"]
+extrapolate = []
+
+[[example]]
+name = "k_type"
+required-features = ["k-type", "f64"]
+
+[[example]]
+name = "j_type"
+required-features = ["f64"]
