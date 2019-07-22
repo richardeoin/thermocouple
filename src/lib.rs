@@ -22,7 +22,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! thermocouple = "0.1.0"
+//! thermocouple = "0.1.2"
 //! ```
 //!
 //! and this to your crate root:
