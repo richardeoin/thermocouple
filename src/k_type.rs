@@ -87,8 +87,7 @@ pub fn e(t: Celsius) -> Millivolts {
             const C: [FP; 11] = K_TYPE_E_BELOW_0;
 
             // Power Series
-            let ps = C[0]
-                + C[1] * t
+            C[0] + C[1] * t
                 + C[2] * t * t
                 + C[3] * t * t * t
                 + C[4] * t * t * t * t
@@ -97,9 +96,7 @@ pub fn e(t: Celsius) -> Millivolts {
                 + C[7] * t * t * t * t * t * t * t
                 + C[8] * t * t * t * t * t * t * t * t
                 + C[9] * t * t * t * t * t * t * t * t * t
-                + C[10] * t * t * t * t * t * t * t * t * t * t;
-
-            ps
+                + C[10] * t * t * t * t * t * t * t * t * t * t
         }
         _ => {
             // 0ºC -> 1372ºC

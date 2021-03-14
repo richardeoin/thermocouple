@@ -153,6 +153,11 @@ macro_rules! thermocouple {
                     }
                 }
             }
+            impl Default for $Type {
+                fn default() -> Self {
+                    $Type::new()
+                }
+            }
 
             $(
                 impl ThermocoupleCore<$unit> for $Type {
