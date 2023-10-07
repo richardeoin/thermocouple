@@ -1,6 +1,6 @@
 //! J-Type thermocouple data
+use crate::polyval::polyval;
 use crate::{Celsius, Millivolts, FP};
-
 const J_TYPE_E_BELOW_760: [FP; 9] = [
     0.000000000000E+00,
     0.503811878150E-01,
@@ -67,28 +67,11 @@ pub fn e(t: Celsius) -> Millivolts {
     let e = match t > 760.0 {
         false => {
             // -210ºC -> 760ºC
-            const C: [FP; 9] = J_TYPE_E_BELOW_760;
-
-            // Power Series
-            C[0] + C[1] * t
-                + C[2] * t * t
-                + C[3] * t * t * t
-                + C[4] * t * t * t * t
-                + C[5] * t * t * t * t * t
-                + C[6] * t * t * t * t * t * t
-                + C[7] * t * t * t * t * t * t * t
-                + C[8] * t * t * t * t * t * t * t * t
+            polyval(J_TYPE_E_BELOW_760, t)
         }
         _ => {
             // 760ºC -> 1200ºC
-            const C: [FP; 6] = J_TYPE_E_ABOVE_760;
-
-            // Power Series
-            C[0] + C[1] * t
-                + C[2] * t * t
-                + C[3] * t * t * t
-                + C[4] * t * t * t * t
-                + C[5] * t * t * t * t * t
+            polyval(J_TYPE_E_ABOVE_760, t)
         }
     };
 
@@ -115,16 +98,7 @@ pub fn t(e: Millivolts) -> Celsius {
         (false, false) => J_TYPE_T2,
     };
 
-    // Power Series
-    let ps = c[0]
-        + c[1] * e
-        + c[2] * e * e
-        + c[3] * e * e * e
-        + c[4] * e * e * e * e
-        + c[5] * e * e * e * e * e
-        + c[6] * e * e * e * e * e * e
-        + c[7] * e * e * e * e * e * e * e
-        + c[8] * e * e * e * e * e * e * e * e;
+    let ps = polyval(c, e);
 
     Celsius(ps)
 }

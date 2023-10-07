@@ -15,7 +15,7 @@ fn bench_type_k_celcius(b: &mut Bencher) {
 
     b.iter(|| {
         let _: Celsius =
-            thermocouple.sense_temperature(Millivolts(2.0));
+            thermocouple.sense_temperature(Millivolts(2.10));
     });
 }
 ///

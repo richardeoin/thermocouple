@@ -1,5 +1,5 @@
 //! T-Type thermocouple data
-use crate::{Celsius, Millivolts, FP};
+use crate::{polyval::polyval, Celsius, Millivolts, FP};
 
 const T_TYPE_E_BELOW_0: [FP; 15] = [
     0.000000000000E+00,
@@ -63,64 +63,11 @@ pub fn e(t: Celsius) -> Millivolts {
     let e = match t > 0.0 {
         false => {
             // -270ºC -> 0ºC
-            const C: [FP; 15] = T_TYPE_E_BELOW_0;
-
-            // Power Series
-            C[0] + C[1] * t
-                + C[2] * t * t
-                + C[3] * t * t * t
-                + C[4] * t * t * t * t
-                + C[5] * t * t * t * t * t
-                + C[6] * t * t * t * t * t * t
-                + C[7] * t * t * t * t * t * t * t
-                + C[8] * t * t * t * t * t * t * t * t
-                + C[9] * t * t * t * t * t * t * t * t * t
-                + C[10] * t * t * t * t * t * t * t * t * t * t
-                + C[11] * t * t * t * t * t * t * t * t * t * t * t
-                + C[12] * t * t * t * t * t * t * t * t * t * t * t * t
-                + C[13]
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                + C[14]
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
-                    * t
+            polyval(T_TYPE_E_BELOW_0, t)
         }
         _ => {
             // 0ºC -> 400ºC
-            const C: [FP; 9] = T_TYPE_E_ABOVE_0;
-
-            // Power Series
-            C[0] + C[1] * t
-                + C[2] * t * t
-                + C[3] * t * t * t
-                + C[4] * t * t * t * t
-                + C[5] * t * t * t * t * t
-                + C[6] * t * t * t * t * t * t
-                + C[7] * t * t * t * t * t * t * t
-                + C[8] * t * t * t * t * t * t * t * t
+            polyval(T_TYPE_E_ABOVE_0, t)
         }
     };
 
@@ -147,14 +94,7 @@ pub fn t(e: Millivolts) -> Celsius {
     };
 
     // Power Series
-    let ps = c[0]
-        + c[1] * e
-        + c[2] * e * e
-        + c[3] * e * e * e
-        + c[4] * e * e * e * e
-        + c[5] * e * e * e * e * e
-        + c[6] * e * e * e * e * e * e
-        + c[7] * e * e * e * e * e * e * e;
+    let ps = polyval(c, e);
 
     Celsius(ps)
 }

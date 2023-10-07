@@ -1,5 +1,5 @@
 //! R-Type thermocouple data
-use crate::{Celsius, Millivolts, FP};
+use crate::{polyval::polyval, Celsius, Millivolts, FP};
 
 const R_TYPE_E_BELOW_1064_18: [FP; 10] = [
     0.000000000000E+00,
@@ -94,39 +94,15 @@ pub fn e(t: Celsius) -> Millivolts {
     let e = match (t > 1064.18, t > 1664.5) {
         (false, _) => {
             // -50ºC -> 1064.18ºC
-            const C: [FP; 10] = R_TYPE_E_BELOW_1064_18;
-
-            // Power Series
-            C[0] + C[1] * t
-                + C[2] * t * t
-                + C[3] * t * t * t
-                + C[4] * t * t * t * t
-                + C[5] * t * t * t * t * t
-                + C[6] * t * t * t * t * t * t
-                + C[7] * t * t * t * t * t * t * t
-                + C[8] * t * t * t * t * t * t * t * t
-                + C[9] * t * t * t * t * t * t * t * t * t
+            polyval(R_TYPE_E_BELOW_1064_18, t)
         }
         (true, false) => {
             // 1064.18ºC -> 1664.5ºC
-            const C: [FP; 6] = R_TYPE_E_ABOVE_1064_18_BELOW_1664_5;
-
-            // Power Series
-            C[0] + C[1] * t
-                + C[2] * t * t
-                + C[3] * t * t * t
-                + C[4] * t * t * t * t
-                + C[5] * t * t * t * t * t
+            polyval(R_TYPE_E_ABOVE_1064_18_BELOW_1664_5, t)
         }
         (true, true) => {
             // 1664.5ºC -> 1768.1ºC
-            const C: [FP; 5] = R_TYPE_E_ABOVE_1664_5;
-
-            // Power Series
-            C[0] + C[1] * t
-                + C[2] * t * t
-                + C[3] * t * t * t
-                + C[4] * t * t * t * t
+            polyval(R_TYPE_E_ABOVE_1664_5, t)
         }
     };
 
@@ -154,18 +130,7 @@ pub fn t(e: Millivolts) -> Celsius {
         (false, false, false) => R_TYPE_T3,
     };
 
-    // Power Series
-    let ps = c[0]
-        + c[1] * e
-        + c[2] * e * e
-        + c[3] * e * e * e
-        + c[4] * e * e * e * e
-        + c[5] * e * e * e * e * e
-        + c[6] * e * e * e * e * e * e
-        + c[7] * e * e * e * e * e * e * e
-        + c[8] * e * e * e * e * e * e * e * e
-        + c[9] * e * e * e * e * e * e * e * e * e
-        + c[10] * e * e * e * e * e * e * e * e * e * e;
+    let ps = polyval(c, e);
 
     Celsius(ps)
 }

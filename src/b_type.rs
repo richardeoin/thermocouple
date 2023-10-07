@@ -1,6 +1,6 @@
 //! B-Type thermocouple data
+use crate::polyval::polyval;
 use crate::{Celsius, Millivolts, FP};
-
 const B_TYPE_E_BELOW_630_615: [FP; 7] = [
     0.000000000000E+00,
     -0.246508183460E-03,
@@ -57,29 +57,11 @@ pub fn e(t: Celsius) -> Millivolts {
     let e = match t > 630.615 {
         false => {
             // 0ºC -> 630.615ºC
-            const C: [FP; 7] = B_TYPE_E_BELOW_630_615;
-
-            // Power Series
-            C[0] + C[1] * t
-                + C[2] * t * t
-                + C[3] * t * t * t
-                + C[4] * t * t * t * t
-                + C[5] * t * t * t * t * t
-                + C[6] * t * t * t * t * t * t
+            polyval(B_TYPE_E_BELOW_630_615, t)
         }
         _ => {
             // 630.615ºC -> 1820ºC
-            const C: [FP; 9] = B_TYPE_E_ABOVE_630_615;
-
-            // Power Series
-            C[0] + C[1] * t
-                + C[2] * t * t
-                + C[3] * t * t * t
-                + C[4] * t * t * t * t
-                + C[5] * t * t * t * t * t
-                + C[6] * t * t * t * t * t * t
-                + C[7] * t * t * t * t * t * t * t
-                + C[8] * t * t * t * t * t * t * t * t
+            polyval(B_TYPE_E_ABOVE_630_615, t)
         }
     };
 
@@ -100,21 +82,10 @@ pub fn t(e: Millivolts) -> Celsius {
     #[cfg(not(any(feature = "extrapolate")))]
     assert!(e <= 13.82 + TOL);
 
-    let c = match e < 2.431 {
-        true => B_TYPE_T0,
-        false => B_TYPE_T1,
+    let ps = match e < 2.431 {
+        true => polyval(B_TYPE_T0, e),
+        false => polyval(B_TYPE_T1, e),
     };
-
-    // Power Series
-    let ps = c[0]
-        + c[1] * e
-        + c[2] * e * e
-        + c[3] * e * e * e
-        + c[4] * e * e * e * e
-        + c[5] * e * e * e * e * e
-        + c[6] * e * e * e * e * e * e
-        + c[7] * e * e * e * e * e * e * e
-        + c[8] * e * e * e * e * e * e * e * e;
 
     Celsius(ps)
 }

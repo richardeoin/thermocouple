@@ -106,6 +106,7 @@ compile_error!(
 
 #[macro_use]
 mod test_utils;
+mod polyval;
 mod units;
 pub use units::{
     Celsius, FPExt, Fahrenheit, Kelvin, Millivolts, Rankine, Reaumur,
