@@ -14,8 +14,10 @@ fn bench_type_k_celcius(b: &mut Bencher) {
     let thermocouple = thermocouple::KType::new();
 
     b.iter(|| {
-        let _: Celsius =
-            thermocouple.sense_temperature(Millivolts(2.10));
+        for i in 0..1000000 {
+            let _: Celsius =
+                thermocouple.sense_temperature(Millivolts(2.0));
+        }
     });
 }
 ///
