@@ -1,6 +1,6 @@
 //! N-Type thermocouple data
+use crate::polyval::polyval;
 use crate::{Celsius, Millivolts, FP};
-
 const N_TYPE_E_BELOW_0: [FP; 9] = [
     0.000000000000E+00,
     0.261591059620E-01,
@@ -75,33 +75,12 @@ pub fn e(t: Celsius) -> Millivolts {
     let e = match t > 0.0 {
         false => {
             // -270ºC -> 0ºC
-            const C: [FP; 9] = N_TYPE_E_BELOW_0;
 
-            // Power Series
-            C[0] + C[1] * t
-                + C[2] * t * t
-                + C[3] * t * t * t
-                + C[4] * t * t * t * t
-                + C[5] * t * t * t * t * t
-                + C[6] * t * t * t * t * t * t
-                + C[7] * t * t * t * t * t * t * t
-                + C[8] * t * t * t * t * t * t * t * t
+            polyval(N_TYPE_E_BELOW_0, t)
         }
         _ => {
             // 0ºC -> 1300ºC
-            const C: [FP; 11] = N_TYPE_E_ABOVE_0;
-
-            // Power Series
-            C[0] + C[1] * t
-                + C[2] * t * t
-                + C[3] * t * t * t
-                + C[4] * t * t * t * t
-                + C[5] * t * t * t * t * t
-                + C[6] * t * t * t * t * t * t
-                + C[7] * t * t * t * t * t * t * t
-                + C[8] * t * t * t * t * t * t * t * t
-                + C[9] * t * t * t * t * t * t * t * t * t
-                + C[10] * t * t * t * t * t * t * t * t * t * t
+            polyval(N_TYPE_E_ABOVE_0, t)
         }
     };
 
@@ -127,19 +106,7 @@ pub fn t(e: Millivolts) -> Celsius {
         (false, true) => N_TYPE_T1,
         (false, false) => N_TYPE_T2,
     };
-
-    // Power Series
-    let ps = c[0]
-        + c[1] * e
-        + c[2] * e * e
-        + c[3] * e * e * e
-        + c[4] * e * e * e * e
-        + c[5] * e * e * e * e * e
-        + c[6] * e * e * e * e * e * e
-        + c[7] * e * e * e * e * e * e * e
-        + c[8] * e * e * e * e * e * e * e * e
-        + c[9] * e * e * e * e * e * e * e * e * e;
-
+    let ps = polyval(c, e);
     Celsius(ps)
 }
 
